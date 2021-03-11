@@ -1,0 +1,12 @@
+wheel
+torch
+pytorch-lightning==1.0.2
+gdown
+addict
+piq
+numpy
+PyWavelets>=1.0.0
+git+git://github.com/fbcotter/pytorch_wavelets.git
+neptune-client
+kornia
+pytorch_fid

@@ -1,0 +1,22 @@
+{
+    "stylegan2-ffhq-config-f_v0.pt": {
+        "url": "https://drive.google.com/uc?id=1Cg8XIGEFZTlCIVLIZywPPWdE3RJFKOEn",
+        "name": "stylegan2-ffhq-config-f_v0.pt",
+        "md5": "41a67ea3a2b037173359980ae0255bc5"
+    },
+    "stylegan2_ffhq_config_f_synthesis_network.ckpt": {
+        "url": "https://drive.google.com/uc?id=1vzGGISwCXix73emSFAi62nckHJZniVK2",
+        "name": "stylegan2_ffhq_config_f_synthesis_network.ckpt",
+        "md5": "43a0216d400ce1fe79587fe28822bd50"
+    },
+    "stylegan2_ffhq_config_f_mapping_network.ckpt": {
+        "url": "https://drive.google.com/uc?id=1Pes8TiRdxcJcGMNuQ66vNkNmnSsaY2Pl",
+        "name": "stylegan2_ffhq_config_f_mapping_network.ckpt",
+        "md5": "608c8d99f80dddf8a5d7351a53b7dac7"
+    },
+    "mobilestylegan_ffhq.ckpt": {
+        "url": "https://drive.google.com/uc?id=1e4A6chzcKeVaRTU77Rq32Bw1UbY9w_q2",
+        "name": "mobilestylegan_ffhq.ckpt",
+        "md5": "c6a23e76375fbbf2d554e199718d73e1"
+    }
+}
