@@ -12,10 +12,10 @@ inputs = [
           
 ]
 
-outputs = gr.outputs.Image(type='numpy', label="Original Image")
+outputs = gr.outputs.Image(type='numpy', label="Output Image")
 
 title = "MobileStylegan"
-description = "demo for MobileStylegan. To use it, simply click submit and optionally adjust alpha and truncation values. Read more at the links below."
+description = "demo for MobileStylegan. To use it, simply click submit and optionally adjust alpha and truncation values. Read more below."
 article = "https://raw.githubusercontent.com/AK391/MobileStyleGAN.pytorch/main/README.md"
 
 
