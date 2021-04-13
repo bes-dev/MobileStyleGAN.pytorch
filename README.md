@@ -9,6 +9,9 @@ Official PyTorch Implementation
 The accompanying videos can be found on [YouTube](https://www.youtube.com/playlist?list=PLstKhmdpWBtwsvq_27ALmPbf_mBLmk0uI).
 For more details, please refer to the [paper](https://arxiv.org/abs/2104.04767).
 
+## New
+* Gradio web demo [Gradio](https://gradio.app/hub/AK391/MobileStyleGAN.pytorch)
+
 ## Requirements
 
 * Python 3.8+
