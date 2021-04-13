@@ -10,3 +10,5 @@ git+git://github.com/fbcotter/pytorch_wavelets.git
 neptune-client
 kornia
 pytorch_fid
+random_face
+gradio
