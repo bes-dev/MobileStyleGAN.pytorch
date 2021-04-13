@@ -16,7 +16,8 @@ outputs = gr.outputs.Image(type='numpy', label="Output Image")
 
 title = "MobileStylegan"
 description = "demo for MobileStylegan. To use it, simply click submit and optionally adjust alpha and truncation values. Read more below."
-article = "https://raw.githubusercontent.com/AK391/MobileStyleGAN.pytorch/main/README.md"
+article = "<p style='text-align: center'><a href='https://arxiv.org/abs/2104.04767'>MobileStyleGAN: A Lightweight Convolutional Neural Network for High-Fidelity Image Synthesis</a> | <a href='https://github.com/bes-dev/MobileStyleGAN.pytorch'>Github Repo</a></p>"
+
 
 
 gr.Interface(mobileface, inputs, outputs, title=title, description=description, article=article).launch()
