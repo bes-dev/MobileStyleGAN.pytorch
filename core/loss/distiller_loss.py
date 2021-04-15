@@ -44,7 +44,10 @@ class DistillerLoss(nn.Module):
         # total loss
         loss["loss"] = 0
         for i, k in enumerate(["l1", "l2", "loss_p", "loss_gp", "loss_g"]):
-            loss["loss"] += self.generator_weights[i] * loss[k]
+            if loss[k] is not None:
+                loss["loss"] += self.generator_weights[i] * loss[k]
+            else:
+                del loss[k]
         return loss
 
     def loss_discriminator(self, pred, gt):
