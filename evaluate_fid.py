@@ -150,6 +150,7 @@ def get_activations(files, model, batch_size=50, dims=2048, device='cpu'):
             pred = adaptive_avg_pool2d(pred, output_size=(1, 1))
 
         pred = pred.squeeze(3).squeeze(2).cpu().numpy()
+        pred_arr.append(pred)
     pred_arr = np.concatenate(pred_arr)
 
     return pred_arr
