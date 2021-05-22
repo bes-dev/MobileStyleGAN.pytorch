@@ -33,7 +33,7 @@ def load_cfg(path):
 def select_weights(ckpt, prefix="student."):
     _ckpt = {}
     for k, v in ckpt.items():
-        if prefix in k:
+        if k.startswith(prefix):
             _ckpt[k.replace(prefix, "")] = v
     return _ckpt
 

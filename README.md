@@ -14,11 +14,21 @@ For more details, please refer to the [paper](https://arxiv.org/abs/2104.04767).
 * Python 3.8+
 * 1–8 high-end NVIDIA GPUs with at least 12 GB of memory. We have done all testing and development using DL Workstation with 4x2080Ti
 
+
 ## Training
 
 ```bash
 pip install -r requirements.txt
 python train.py --cfg configs/mobile_stylegan_ffhq.json --gpus <n_gpus>
+```
+
+## Convert checkpoint from rosinality/stylegan2-pytorch
+
+Our framework supports StyleGAN2 checkpoints format from rosinality/stylegan2-pytorch.
+To convert ckpt your own checkpoint of StyleGAN2 to our framework:
+
+```bash
+python convert_rosinality_ckpt.py --ckpt <path_to_rosinality_stylegan2_ckpt> --ckpt-mnet <path_to_output_mapping_network_ckpt> --ckpt-snet <path_to_output_synthesis_network_ckpt>
 ```
 
 ## Generate images using MobileStyleGAN
