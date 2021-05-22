@@ -8,7 +8,7 @@ from core.distiller import Distiller
 from core.model_zoo import model_zoo
 from tqdm import tqdm
 
-@torch.no_grad
+@torch.no_grad()
 def main(args):
     cfg = load_cfg(args.cfg)
     distiller = Distiller(cfg)
