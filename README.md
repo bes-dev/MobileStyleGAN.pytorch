@@ -24,7 +24,7 @@ python train.py --cfg configs/mobile_stylegan_ffhq.json --gpus <n_gpus>
 
 ## Convert checkpoint from rosinality/stylegan2-pytorch
 
-Our framework supports StyleGAN2 checkpoints format from rosinality/stylegan2-pytorch.
+Our framework supports StyleGAN2 checkpoints format from [rosinality/stylegan2-pytorch](https://github.com/rosinality/stylegan2-pytorch).
 To convert ckpt your own checkpoint of StyleGAN2 to our framework:
 
 ```bash
