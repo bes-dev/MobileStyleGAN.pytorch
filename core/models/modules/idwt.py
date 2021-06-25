@@ -21,7 +21,7 @@ class DWTInverse(nn.Module):
         wave (str or pywt.Wavelet): Which wavelet to use
         C: deprecated, will be removed in future
     """
-    def __init__(self, wave='db1', mode='zero', onnx_trace=False):
+    def __init__(self, wave='db1', mode='zero', trace_model=False):
         super().__init__()
         if isinstance(wave, str):
             wave = pywt.Wavelet(wave)
@@ -42,7 +42,7 @@ class DWTInverse(nn.Module):
         self.register_buffer('g0_row', filts[2])
         self.register_buffer('g1_row', filts[3])
         self.mode = mode
-        self.onnx_trace = onnx_trace
+        self.trace_model = trace_model
 
     def forward(self, coeffs):
         """
@@ -79,7 +79,7 @@ class DWTInverse(nn.Module):
                 ll = ll[...,:-1,:]
             if ll.shape[-1] > h.shape[-1]:
                 ll = ll[...,:-1]
-            if not self.onnx_trace:
+            if not self.trace_model:
                 ll = SFB2D.apply(ll, h, self.g0_col, self.g1_col, self.g0_row, self.g1_row, mode)
             else:
                 ll = _SFB2D(ll, h, self.g0_col, self.g1_col, self.g0_row, self.g1_row, mode)

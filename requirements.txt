@@ -10,3 +10,4 @@ git+git://github.com/fbcotter/pytorch_wavelets.git
 neptune-client
 kornia
 pytorch_fid
+coremltools

@@ -1,3 +1,5 @@
+import os
+# pytorch
 import torch
 import torch.nn as nn
 import pytorch_lightning as pl
@@ -15,6 +17,8 @@ from core.loss.distiller_loss import DistillerLoss
 from core.models.inception_v3 import load_inception_v3
 # evaluation metric
 from piq import KID
+# utils
+from core.utils import apply_trace_model_mode
 
 
 class Distiller(pl.LightningModule):
@@ -159,7 +163,7 @@ class Distiller(pl.LightningModule):
         img_s = self.student(style, noise=out_t["noise"])["img"]
         return img_s, out_t["img"]
 
-    def to_onnx(self, onnx_name):
+    def to_onnx(self, output_dir):
         class Wrapper(nn.Module):
             def __init__(
                     self,
@@ -173,32 +177,64 @@ class Distiller(pl.LightningModule):
             def forward(self, style):
                 return self.m(style, noise=self.noise)["img"]
 
-        def onnx_trace_setup(m):
-            if hasattr(m, 'onnx_trace'):
-                m.onnx_trace = True
-
         print("prepare style...")
         var = torch.randn(1, self.mapping_net.style_dim).to(self.device_info.device)
         style = self.mapping_net(var)
 
         print("convert mapping network...")
-        self.mapping_net.apply(onnx_trace_setup)
+        self.mapping_net.apply(apply_trace_model_mode(True))
         torch.onnx.export(
             self.mapping_net,
             (var,),
-            onnx_name + "_mnet.onnx",
+            os.path.join(output_dir, "MappingNetwork.onnx"),
             input_names = ['var'],
             output_names = ['style'],
             verbose=True
         )
 
         print("convert synthesis network...")
-        self.student.apply(onnx_trace_setup)
+        self.student.apply(apply_trace_model_mode(True))
         torch.onnx.export(
             Wrapper(self.student, style),
             (style,),
-            onnx_name + "_snet.onnx",
+            os.path.join(output_dir, "SynthesisNetwork.onnx"),
             input_names = ['style'],
             output_names = ['img'],
             verbose=True
         )
+
+    def to_coreml(self, output_dir):
+        import coremltools as ct
+
+        print("prepare style...")
+        var = torch.randn(1, self.mapping_net.style_dim).to(self.device_info.device)
+        style = self.mapping_net(var)
+
+        print("convert mapping network...")
+        self.mapping_net.apply(apply_trace_model_mode(True))
+        mapping_net_trace = torch.jit.trace(self.mapping_net, var)
+        mapping_net_coreml = ct.convert(
+            mapping_net_trace,
+            inputs=[ct.TensorType(name="var", shape=var.shape)]
+        )
+        mapping_net_coreml.save(os.path.join(output_dir, "MappingNetwork.mlmodel"))
+
+        print("convert synthesis network...")
+        self.student.apply(apply_trace_model_mode(True))
+        # initialize noise buffers
+        self.student(style)
+        class Wrapper(nn.Module):
+            def __init__(self, m):
+                super().__init__()
+                self.m = m
+
+            def forward(self, style):
+                return self.m(style)["img"]
+
+        synthesis_net = Wrapper(self.student)
+        synthesis_net_trace = torch.jit.trace(synthesis_net, style)
+        synthesis_net_coreml = ct.convert(
+            synthesis_net_trace,
+            inputs=[ct.TensorType(name="style", shape=style.shape)]
+        )
+        synthesis_net_coreml.save(os.path.join(output_dir, "SynthesisNetwork.mlmodel"))

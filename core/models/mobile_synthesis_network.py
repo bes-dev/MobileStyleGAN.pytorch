@@ -46,15 +46,19 @@ class MobileSynthesisNetwork(nn.Module):
             channels_in = channels_out
 
         self.idwt = DWTInverse(mode="zero", wave="db1")
+        self.trace_model = False
 
     def forward(self, style, noise=None):
         out = {"noise": [], "freq": [], "img": None}
 
         hidden = self.input(style)
-        if noise is None:
-            _noise = torch.randn(1, 1, hidden.size(-1), hidden.size(-1)).to(style.device)
+        if not self.trace_model:
+            if noise is None:
+                _noise = torch.randn(1, 1, hidden.size(-1), hidden.size(-1)).to(style.device)
+            else:
+                _noise = noise[0]
         else:
-            _noise = noise[0]
+            _noise = None
         out["noise"].append(_noise)
         hidden = self.conv1(hidden, style, noise=_noise)
         img = self.to_img1(hidden, style)
@@ -62,10 +66,13 @@ class MobileSynthesisNetwork(nn.Module):
 
         for i, m in enumerate(self.layers):
             shape = [2, 1, 1, 2 ** (i + 3), 2 ** (i + 3)]
-            if noise is None:
-                _noise = torch.randn(*shape).to(style.device)
+            if not self.trace_model:
+                if noise is None and not self.onnx_export:
+                    _noise = torch.randn(*shape).to(style.device)
+                else:
+                    _noise = noise[i + 1]
             else:
-                _noise = noise[i + 1]
+                _noise = [None, None]
             out["noise"].append(_noise)
             hidden, freq = m(hidden, style, _noise)
             out["freq"].append(freq)

@@ -4,6 +4,13 @@ import gdown
 from addict import Dict
 
 
+def apply_trace_model_mode(mode=False):
+    def _apply_trace_model_mode(m):
+        if hasattr(m, 'trace_model'):
+            m.trace_model = mode
+    return _apply_trace_model_mode
+
+
 def tensor_to_img(t, normalize=True, range=(-1, 1), to_numpy=True, rgb2bgr=True):
     if normalize:
         t.clamp_(min=range[0], max=range[1])

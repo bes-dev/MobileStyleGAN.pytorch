@@ -9,6 +9,12 @@ Official PyTorch Implementation
 The accompanying videos can be found on [YouTube](https://www.youtube.com/playlist?list=PLstKhmdpWBtwsvq_27ALmPbf_mBLmk0uI).
 For more details, please refer to the [paper](https://arxiv.org/abs/2104.04767).
 
+## Updates
+
+[06.2021]
+* Add export to CoreML format.
+* Add converter from [rosinality/stylegan2-pytorch](https://github.com/rosinality/stylegan2-pytorch) checkpoint format.
+
 ## Requirements
 
 * Python 3.8+
@@ -59,7 +65,12 @@ python compare.py --cfg configs/mobile_stylegan_ffhq.json --ckpt <path_to_ckpt>
 
 ## Convert to ONNX
 ```bash
-python train.py --cfg configs/mobile_stylegan_ffhq.json --ckpt <path_to_ckpt> --to-onnx <onnx_prefix_name>
+python train.py --cfg configs/mobile_stylegan_ffhq.json --ckpt <path_to_ckpt> --export-model onnx --export-dir <output_dir>
+```
+
+## Convert to CoreML
+```bash
+python train.py --cfg configs/mobile_stylegan_ffhq.json --ckpt <path_to_ckpt> --export-model coreml --export-dir <output_dir>
 ```
 
 ## Deployment using OpenVINO

@@ -122,7 +122,7 @@ class EqualConv2d(nn.Module):
 
 class EqualLinear(nn.Module):
     def __init__(
-            self, in_dim, out_dim, bias=True, bias_init=0, lr_mul=1, activation=None, onnx_trace=False
+            self, in_dim, out_dim, bias=True, bias_init=0, lr_mul=1, activation=None, trace_model=False
     ):
         super().__init__()
 
@@ -138,12 +138,12 @@ class EqualLinear(nn.Module):
 
         self.scale = (1 / math.sqrt(in_dim)) * lr_mul
         self.lr_mul = lr_mul
-        self.onnx_trace = onnx_trace
+        self.trace_model = trace_model
 
     def forward(self, input):
         if self.activation:
             out = F.linear(input, self.weight * self.scale)
-            out = fused_leaky_relu(out, self.bias * self.lr_mul, onnx_trace=self.onnx_trace)
+            out = fused_leaky_relu(out, self.bias * self.lr_mul, trace_model=self.trace_model)
 
         else:
             out = F.linear(
