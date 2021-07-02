@@ -122,6 +122,8 @@ class Distiller(pl.LightningModule):
     @torch.no_grad()
     def make_sample(self, batch):
         style = self.mapping_net(batch["noise"])
+        if self.cfg.truncated:
+            style = self.style_mean + 0.5 * (style - self.style_mean)
         gt = self.synthesis_net(style)
         return style, gt
 
@@ -142,7 +144,7 @@ class Distiller(pl.LightningModule):
                 self.opt_to_mode[i] = "g"
             elif mode == "d":
                 print("setup discriminator train mode on...")
-                opts.append(torch.optim.Adam(self.loss.parameters(), lr=self.cfg.lr_gan))
+                opts.append(torch.optim.Adam(self.loss.gan_loss.parameters(), lr=self.cfg.lr_gan))
                 self.opt_to_mode[i] = "d"
         return opts, []
 

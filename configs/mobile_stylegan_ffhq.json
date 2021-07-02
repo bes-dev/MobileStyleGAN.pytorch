@@ -37,6 +37,7 @@
         "lr_gan": 5e-4,
         "batch_size": 2,
         "max_epochs": 100,
-        "mode": "g,d"
+        "mode": "g,d",
+        "truncated": false
     }
 }
