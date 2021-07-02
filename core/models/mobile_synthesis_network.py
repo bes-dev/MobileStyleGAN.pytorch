@@ -1,5 +1,6 @@
 import torch
 import torch.nn as nn
+from .utils import NoiseManager
 from .modules import StyledConv2d, \
     ConstantInput, \
     MultichannelIamge, \
@@ -46,35 +47,23 @@ class MobileSynthesisNetwork(nn.Module):
             channels_in = channels_out
 
         self.idwt = DWTInverse(mode="zero", wave="db1")
+        self.register_buffer("device_info", torch.zeros(1))
         self.trace_model = False
 
     def forward(self, style, noise=None):
         out = {"noise": [], "freq": [], "img": None}
+        noise = NoiseManager(noise, self.device_info.device, self.trace_model)
 
         hidden = self.input(style)
-        if not self.trace_model:
-            if noise is None:
-                _noise = torch.randn(1, 1, hidden.size(-1), hidden.size(-1)).to(style.device)
-            else:
-                _noise = noise[0]
-        else:
-            _noise = None
-        out["noise"].append(_noise)
-        hidden = self.conv1(hidden, style, noise=_noise)
+        out["noise"].append(noise(hidden.size(-1)))
+        hidden = self.conv1(hidden, style, noise=out["noise"][-1])
         img = self.to_img1(hidden, style)
         out["freq"].append(img)
 
         for i, m in enumerate(self.layers):
             shape = [2, 1, 1, 2 ** (i + 3), 2 ** (i + 3)]
-            if not self.trace_model:
-                if noise is None and not self.onnx_export:
-                    _noise = torch.randn(*shape).to(style.device)
-                else:
-                    _noise = noise[i + 1]
-            else:
-                _noise = [None, None]
-            out["noise"].append(_noise)
-            hidden, freq = m(hidden, style, _noise)
+            out["noise"].append(noise(2 ** (i + 3), 2))
+            hidden, freq = m(hidden, style, noise=out["noise"][-1])
             out["freq"].append(freq)
 
         out["img"] = self.dwt_to_img(out["freq"][-1])
