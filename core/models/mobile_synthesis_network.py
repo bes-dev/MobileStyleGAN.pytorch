@@ -61,7 +61,6 @@ class MobileSynthesisNetwork(nn.Module):
         out["freq"].append(img)
 
         for i, m in enumerate(self.layers):
-            shape = [2, 1, 1, 2 ** (i + 3), 2 ** (i + 3)]
             out["noise"].append(noise(2 ** (i + 3), 2))
             hidden, freq = m(hidden, style, noise=out["noise"][-1])
             out["freq"].append(freq)
