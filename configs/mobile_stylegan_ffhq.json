@@ -25,7 +25,12 @@
     },
     "distillation_loss": {
         "perceptual_size": 256,
-        "generator_weights": [1.0, 1.0, 1.0, 0.5, 0.1]
+        "loss_weights": {
+            "l1": 1.0,
+            "l2": 1.0,
+            "loss_p": 1.0,
+            "loss_g": 0.5
+        }
     },
     "trainer": {
         "monitor": "kid_val",
@@ -38,6 +43,7 @@
         "batch_size": 2,
         "max_epochs": 100,
         "mode": "g,d",
+        "reg_d_interval": 16,
         "truncated": false
     }
 }

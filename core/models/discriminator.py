@@ -74,7 +74,7 @@ class ResBlock(nn.Module):
 
 
 class Discriminator(nn.Module):
-    def __init__(self, size, channels_in=3, channel_multiplier=2, blur_kernel=[1, 3, 3, 1]):
+    def __init__(self, size, channels_in=3, channel_multiplier=2, blur_kernel=[1, 3, 3, 1], activate=True):
         super().__init__()
 
         channels = {
@@ -112,28 +112,26 @@ class Discriminator(nn.Module):
             EqualLinear(channels[4] * 4 * 4, channels[4], activation='fused_lrelu'),
             EqualLinear(channels[4], 1),
         )
+        self.activate = activate
 
     def forward(self, x):
-        out = {"features": []}
-        for m in self.convs:
-            x = m(x)
-            out["features"].append(x)
-        # out = self.convs(input)
+        out = self.convs(x)
+        out = self.minibatch_discrimination(out, self.stddev_group, self.stddev_feat)
+        out = self.final_conv(out)
+        out = out.view(out.size(0), -1)
+        out = self.final_linear(out)
+        if self.activate:
+            out = out.sigmoid()
+        return {"out": out}
 
-        batch, channel, height, width = x.shape
-        group = min(batch, self.stddev_group)
-        stddev = x.view(
-            group, -1, self.stddev_feat, channel // self.stddev_feat, height, width
-        )
+    @staticmethod
+    def minibatch_discrimination(x, stddev_group, stddev_feat):
+        out = x
+        batch, channel, height, width = out.shape
+        group = min(batch, stddev_group)
+        stddev = out.view(group, -1, stddev_feat, channel // stddev_feat, height, width)
         stddev = torch.sqrt(stddev.var(0, unbiased=False) + 1e-8)
         stddev = stddev.mean([2, 3, 4], keepdims=True).squeeze(2)
         stddev = stddev.repeat(group, 1, height, width)
-        x = torch.cat([x, stddev], 1)
-
-        x = self.final_conv(x)
-
-        x = x.view(batch, -1)
-        x = self.final_linear(x).sigmoid()
-        out["out"] = x
-
+        out = torch.cat([out, stddev], 1)
         return out
