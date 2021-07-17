@@ -1,5 +1,5 @@
 wheel
-torch==1.7.1
+torch
 pytorch-lightning==1.0.2
 gdown==3.12.2
 addict==2.2.1
