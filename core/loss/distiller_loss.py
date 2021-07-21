@@ -1,7 +1,7 @@
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
-from core.loss.gan_loss import GANLoss
+from core.loss.non_saturating_gan_loss import NonSaturatingGANLoss
 from core.loss.perceptual_loss import PerceptualLoss
 from pytorch_wavelets import DWTInverse, DWTForward
 
@@ -11,7 +11,7 @@ class DistillerLoss(nn.Module):
             self,
             discriminator_size,
             perceptual_size=256,
-            generator_weights=[1.0, 1.0, 1.0, 0.5, 0.1]
+            loss_weights={"l1": 1.0, "l2": 1.0, "loss_p": 1.0, "loss_g": 0.5}
     ):
         super().__init__()
         # l1/l2 loss
@@ -20,12 +20,14 @@ class DistillerLoss(nn.Module):
         # perceptual_loss
         self.perceptual_loss = PerceptualLoss(perceptual_size)
         # gan loss
-        self.gan_loss = GANLoss(image_size=int(discriminator_size))
-        self.generator_weights = generator_weights
+        self.gan_loss = NonSaturatingGANLoss(image_size=int(discriminator_size))
+        # loss weights
+        self.loss_weights = loss_weights
+        # utils
         self.dwt = DWTForward(J=1, mode='zero', wave='db1')
         self.idwt = DWTInverse(mode="zero", wave="db1")
 
-    def loss_generator(self, pred, gt):
+    def loss_g(self, pred, gt):
         # l1/l2 loss
         loss = {"l1": 0, "l2": 0}
         for _pred in pred["freq"]:
@@ -39,21 +41,26 @@ class DistillerLoss(nn.Module):
         # perceptual_loss
         loss["loss_p"] = self.perceptual_loss(pred["img"], gt["img"])
         # gan loss
-        loss["loss_g"], loss["loss_gp"] = self.gan_loss.loss_g(pred["img"], gt["img"])
+        loss["loss_g"] = self.gan_loss.loss_g(pred["img"], gt["img"])
 
         # total loss
         loss["loss"] = 0
-        for i, k in enumerate(["l1", "l2", "loss_p", "loss_gp", "loss_g"]):
+        for k, w in self.loss_weights.items():
             if loss[k] is not None:
-                loss["loss"] += self.generator_weights[i] * loss[k]
+                loss["loss"] += w * loss[k]
             else:
                 del loss[k]
         return loss
 
-    def loss_discriminator(self, pred, gt):
+    def loss_d(self, pred, gt):
         loss = {}
         loss["loss"] = loss["loss_d"] = self.gan_loss.loss_d(pred["img"].detach(), gt["img"])
         return loss
+
+    def reg_d(self, real):
+        out = {}
+        out["loss"] = out["d_reg"] = self.gan_loss.reg_d(real["img"])
+        return out
 
     def img_to_dwt(self, img):
         low, high = self.dwt(img)

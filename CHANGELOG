@@ -1,0 +1,7 @@
+[07.2021]
+* Migrate from Vanilla GANLoss to Non-saturating GANLoss.
+* Add new checkpoint for 1024x1024 FFHQ model (improve FID: 12.38 -> 7.75)
+
+[06.2021]
+* Add export to CoreML format.
+* Add converter from rosinality/stylegan2-pytorch (https://github.com/rosinality/stylegan2-pytorch) checkpoint format.

@@ -88,7 +88,7 @@ class Distiller(pl.LightningModule):
         gt_inc = self.inception(gt["img"])[0].view(style.size(0), -1)
         # compute val_loss
         pred = self.student(style, noise=gt["noise"])
-        loss = self.loss.loss_generator(pred, gt)
+        loss = self.loss.loss_g(pred, gt)
         return {"pred": pred_inc, "gt": gt_inc, "loss_val": loss["loss"]}
 
     def validation_epoch_end(self, outputs):
@@ -109,14 +109,18 @@ class Distiller(pl.LightningModule):
     def generator_step(self, batch, batch_nb):
         style, gt = self.make_sample(batch)
         pred = self.student(style, noise=gt["noise"])
-        loss = self.loss.loss_generator(pred, gt)
+        loss = self.loss.loss_g(pred, gt)
         return loss
 
     def discriminator_step(self, batch, batch_nb):
         style, gt = self.make_sample(batch)
         with torch.no_grad():
             pred = self.student(style, noise=gt["noise"])
-        loss = self.loss.loss_discriminator(pred, gt)
+        if self.global_step % self.cfg.reg_d_interval != 0:
+            loss = self.loss.loss_d(pred, gt)
+        else:
+            loss = self.loss.reg_d(gt)
+            loss["loss"] *= self.cfg.reg_d_interval
         return loss
 
     @torch.no_grad()
