@@ -1,8 +1,7 @@
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
-# from core.loss.gan_loss import GANLoss
-from core.loss.non_saturating_gan_loss import NonSaturatingGANLoss as GANLoss
+from core.loss.non_saturating_gan_loss import NonSaturatingGANLoss
 from core.loss.perceptual_loss import PerceptualLoss
 from pytorch_wavelets import DWTInverse, DWTForward
 
@@ -21,7 +20,7 @@ class DistillerLoss(nn.Module):
         # perceptual_loss
         self.perceptual_loss = PerceptualLoss(perceptual_size)
         # gan loss
-        self.gan_loss = GANLoss(image_size=int(discriminator_size))
+        self.gan_loss = NonSaturatingGANLoss(image_size=int(discriminator_size))
         # loss weights
         self.loss_weights = loss_weights
         # utils

@@ -116,7 +116,6 @@ class Distiller(pl.LightningModule):
         style, gt = self.make_sample(batch)
         with torch.no_grad():
             pred = self.student(style, noise=gt["noise"])
-        # loss = self.loss.loss_d(pred, gt)
         if self.global_step % self.cfg.reg_d_interval != 0:
             loss = self.loss.loss_d(pred, gt)
         else:

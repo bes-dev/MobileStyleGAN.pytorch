@@ -14,9 +14,14 @@
         "name": "stylegan2_ffhq_config_f_mapping_network.ckpt",
         "md5": "608c8d99f80dddf8a5d7351a53b7dac7"
     },
-    "mobilestylegan_ffhq.ckpt": {
+    "mobilestylegan_ffhq_v1.ckpt": {
         "url": "https://drive.google.com/uc?id=1e4A6chzcKeVaRTU77Rq32Bw1UbY9w_q2",
         "name": "mobilestylegan_ffhq.ckpt",
         "md5": "c6a23e76375fbbf2d554e199718d73e1"
+    },
+    "mobilestylegan_ffhq.ckpt": {
+        "url": "https://drive.google.com/uc?id=11Kja0XGE8liLb6R5slNZjF3j3v_6xydt",
+        "name": "mobilestylegan_ffhq.ckpt",
+        "md5": "8de24b4d08049c32dbec8beca5ed2074"
     }
 }

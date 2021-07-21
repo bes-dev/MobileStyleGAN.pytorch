@@ -9,12 +9,6 @@ Official PyTorch Implementation
 The accompanying videos can be found on [YouTube](https://www.youtube.com/playlist?list=PLstKhmdpWBtwsvq_27ALmPbf_mBLmk0uI).
 For more details, please refer to the [paper](https://arxiv.org/abs/2104.04767).
 
-## Updates
-
-[06.2021]
-* Add export to CoreML format.
-* Add converter from [rosinality/stylegan2-pytorch](https://github.com/rosinality/stylegan2-pytorch) checkpoint format.
-
 ## Requirements
 
 * Python 3.8+
@@ -81,7 +75,7 @@ We provide external library [random_face](https://github.com/bes-dev/random_face
 
 |Name|FID|
 |:---|:--|
-|[mobilestylegan_ffhq.ckpt](https://drive.google.com/file/d/1e4A6chzcKeVaRTU77Rq32Bw1UbY9w_q2/view?usp=sharing)|12.38|
+|[mobilestylegan_ffhq.ckpt](https://drive.google.com/uc?id=11Kja0XGE8liLb6R5slNZjF3j3v_6xydt)|7.75|
 
 (*) Our framework supports automatic download pretrained models, just use `--ckpt <pretrined_model_name>`.
 
