@@ -4,7 +4,7 @@ import torch
 import torch.nn as nn
 import pytorch_lightning as pl
 # dataset
-from core.dataset import NoiseDataset
+from core.dataset import NoiseDataset, ImageDataset
 # teacher model
 from core.model_zoo import model_zoo
 from core.models.mapping_network import MappingNetwork
@@ -27,7 +27,8 @@ class Distiller(pl.LightningModule):
         self.cfg = cfg.trainer
 
         # dataset
-        self.trainset = NoiseDataset(batch_size=self.cfg.batch_size, **cfg.trainset)
+        # self.trainset = NoiseDataset(batch_size=self.cfg.batch_size, **cfg.trainset)
+        self.trainset = ImageDataset(transforms=ImageDataset.get_default_transforms(), **cfg.trainset)
         self.valset = NoiseDataset(batch_size=self.cfg.batch_size, **cfg.valset)
 
         # teacher model
