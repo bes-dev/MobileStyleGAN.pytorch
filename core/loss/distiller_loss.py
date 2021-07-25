@@ -87,7 +87,7 @@ class DistillerLoss(nn.Module):
             rgbs.append(rgb.detach())
         return rgbs
 
-    def make_freq_pyramid(self, freq):
+    def make_freq_pyramid(self, freqs):
         rgbs = []
         for f in freqs:
             rgbs.append(self.dwt_to_img(f).detach())
