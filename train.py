@@ -51,7 +51,7 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     # pipeline configure
     parser.add_argument("--gpus", type=int, default=0, help="number of available GPUs")
-    parser.add_argument('--distributed-backend', type=str, default="ddp", choices=('dp', 'ddp', 'ddp2'),
+    parser.add_argument('--distributed-backend', type=str, default=None, choices=('dp', 'ddp', 'ddp2'),
                         help='supports three options dp, ddp, ddp2')
     parser.add_argument("--checkpoint_dir", type=str, default=None, help="path to checkpoint_dir")
     parser.add_argument("--val-check-interval", type=int, default=500, help="validation check interval")

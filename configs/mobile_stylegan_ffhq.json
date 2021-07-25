@@ -40,7 +40,7 @@
         "num_workers": 0,
         "lr_student": 5e-4,
         "lr_gan": 5e-4,
-        "batch_size": 2,
+        "batch_size": 1,
         "max_epochs": 100,
         "mode": "g,d",
         "reg_d_interval": 16,
