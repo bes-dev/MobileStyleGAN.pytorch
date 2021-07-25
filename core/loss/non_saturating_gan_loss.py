@@ -48,7 +48,7 @@ class NonSaturatingGANLoss(nn.Module):
         return fake_loss
 
     def loss_d(self, fake, real):
-        fake, real = fake.detach(), real.detach()
+        # fake, real = fake.detach(), real.detach()
         # fake loss
         fake_pred = self(fake, True)["out"]
         fake_loss = F.softplus( fake_pred ).mean()
