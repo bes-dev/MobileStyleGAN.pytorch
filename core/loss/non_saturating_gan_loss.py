@@ -4,7 +4,7 @@ import torch.nn.functional as F
 from torch.autograd import grad
 # from core.models.discriminator import Discriminator
 from core.models.multiscale_discriminator import Discriminator
-from .diffaug import get_default_transforms
+from .diffaug import DiffAug
 
 
 class R1Regularization(nn.Module):
@@ -34,13 +34,14 @@ class NonSaturatingGANLoss(nn.Module):
             activate=False
         )
         # diffaugs
-        self.transforms = get_default_transforms()
+        # self.transforms = get_default_transforms()
+        self.transforms = DiffAug()
         # r1 regularization
         self.r1_reg = R1Regularization(r1_gamma)
 
     def forward(self, x, diffaug_mode=True):
-        # if self.transforms is not None and diffaug_mode:
-        #     x = self.transforms(x)
+        if self.transforms is not None and diffaug_mode:
+            x = self.transforms.apply_to_pyramid(x)
         return self.m(x)
 
     def loss_g(self, fake, *args, **kwargs):
