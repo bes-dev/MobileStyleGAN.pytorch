@@ -16,18 +16,28 @@ def get_default_transforms():
 
 class DiffAug:
     def __init__(self):
-        self.transforms = get_default_transforms()
+        # self.transforms = get_default_transforms()
+        self.m = kornia.augmentation.RandomAffine(
+            translate=(0.1, 0.3),
+            scale=(0.7, 1.2),
+            degrees=(-20, 20)
+        )
 
     def apply(self, img):
-        return self.transforms(img)
+        return self.m(img)
 
     def apply_to_pyramid(self, pyramid):
-        for t in self.transforms:
-            params = t.generate_parameters(
-                self.get_normalized_batch_size(pyramid[0].size())
-            )
-            for i in range(len(pyramid)):
-                pyramid[i] = t.apply_transform(pyramid[i], params)
+        # for t in self.transforms:
+        #     params = t.generate_parameters(
+        #         self.get_normalized_batch_size(pyramid[0].size())
+        #     )
+        #     for i in range(len(pyramid)):
+        #         pyramid[i] = t.apply_transform(pyramid[i], params)
+        params = self.m.generate_parameters(
+            self.get_normalized_batch_size(pyramid[0].size())
+        )
+        for i in range(len(pyramid)):
+            pyramid[i] = self.m.apply_transform(pyramid[i], params)
         return pyramid
 
     def get_normalized_batch_size(self, size):
