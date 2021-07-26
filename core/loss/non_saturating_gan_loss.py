@@ -40,8 +40,8 @@ class NonSaturatingGANLoss(nn.Module):
         self.r1_reg = R1Regularization(r1_gamma)
 
     def forward(self, x, diffaug_mode=True):
-        if self.transforms is not None and diffaug_mode:
-            x = self.transforms.apply_to_pyramid(x)
+        # if self.transforms is not None and diffaug_mode:
+        #     x = self.transforms.apply_to_pyramid(x)
         return self.m(x)
 
     def loss_g(self, fake, *args, **kwargs):
