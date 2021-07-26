@@ -52,9 +52,16 @@ def load_weights(target, source_state):
         if k in source_state and v.size() == source_state[k].size():
             new_dict[k] = source_state[k]
         elif k in source_state and v.size() != source_state[k].size():
-            print(f"src: {source_state[k].size()}, tgt: {v.size()}")
-            new_dict[k] = v
+            print(f"[{k}] src: {source_state[k].size()}, tgt: {v.size()}")
+            new_dict[k] = split_by_size(source_state[k], v.size())
         else:
             print(f"key {k} not loaded...")
             new_dict[k] = v
     target.load_state_dict(new_dict)
+
+
+def split_by_size(t, size):
+    tmp = t
+    for i in range(len(size)):
+        tmp = tmp.split([size[i], t.size(i) - size[i]], dim=i)[0]
+    return tmp

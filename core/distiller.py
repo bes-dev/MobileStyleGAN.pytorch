@@ -157,8 +157,11 @@ class Distiller(pl.LightningModule):
         style = self.mapping_net(var)
         if truncated:
             style = self.style_mean + 0.5 * (style - self.style_mean)
-        img = self.student(style)["img"]
-        return img
+        # img = self.student(style)["img"]
+        img = self.student(style)
+        img_1 = self.student.dwt_to_img(img["freq"][-1])
+        img_2 = self.student.dwt_to_img(img["freq"][-2])
+        return img_1, img_2
 
     def simultaneous_forward(self, var, truncated=False):
         var = var.to(self.device_info.device)

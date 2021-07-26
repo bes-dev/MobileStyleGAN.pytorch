@@ -74,7 +74,7 @@ class ResBlock(nn.Module):
 
 
 class Discriminator(nn.Module):
-    def __init__(self, size, channels_in=3, channel_multiplier=2, blur_kernel=[1, 3, 3, 1], activate=True):
+    def __init__(self, size, channels_in=3, channel_multiplier=2, blur_kernel=[1, 3, 3, 1], activate=True, channels_aux=8):
         super().__init__()
 
         channels = {
@@ -100,16 +100,11 @@ class Discriminator(nn.Module):
             out_channel = channels[2 ** (i - 1)]
 
             # convs.append(ResBlock(in_channel, out_channel, blur_kernel))
-            # if i > 3:
-            #     convs.append(ResBlock(in_channel, out_channel - channels_in, blur_kernel))
-            #     aux.append(ConvLayer(channels_in, channels_in, 1))
-            # else:
-            #     convs.append(ResBlock(in_channel, out_channel, blur_kernel))
-
-            convs.append(ResBlock(in_channel, out_channel, blur_kernel))
             if i > 3:
-                aux.append(ConvLayer(channels_in, out_channel, 1))
-
+                convs.append(ResBlock(in_channel, out_channel - channels_aux, blur_kernel))
+                aux.append(ConvLayer(channels_in, channels_aux, 1))
+            else:
+                convs.append(ResBlock(in_channel, out_channel, blur_kernel))
 
             in_channel = out_channel
 
@@ -127,12 +122,10 @@ class Discriminator(nn.Module):
         self.activate = activate
 
     def forward(self, rgbs):
-        # out = self.convs(x)
         out = self.convs[0](rgbs[0])
 
         for i, (conv, aux) in enumerate(zip(self.convs[1:-1], self.aux)):
-            out = conv(out) + aux(rgbs[i+1])
-            # out = torch.cat([conv(out), aux(rgbs[i+1])], dim=1)
+            out = torch.cat([conv(out), aux(rgbs[i+1])], dim=1)
             # print(out.size())
 
         out = self.convs[-1](out)

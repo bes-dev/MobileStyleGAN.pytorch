@@ -17,8 +17,11 @@ def main(args):
 
     while True:
         var = torch.randn(1, distiller.mapping_net.style_dim)
-        img_s = distiller(var, truncated=args.truncated)
-        cv2.imshow("demo", tensor_to_img(img_s[0].cpu()))
+        img_1, img_2 = distiller(var, truncated=args.truncated)
+        print(img_1.size(), img_2.size())
+        # cv2.imshow("demo", tensor_to_img(img_s[0].cpu()))
+        cv2.imshow("img_1", tensor_to_img(img_1[0].cpu()))
+        cv2.imshow("img_2", tensor_to_img(img_2[0].cpu()))
         key = chr(cv2.waitKey() & 255)
         if key == 'q':
             break
