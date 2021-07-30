@@ -1,4 +1,6 @@
 import os
+# random
+import random
 # pytorch
 import torch
 import torch.nn as nn
@@ -125,15 +127,19 @@ class Distiller(pl.LightningModule):
 
     @torch.no_grad()
     def make_sample(self, batch):
+        def make_style():
+            var = torch.randn(self.cfg.batch_size, self.mapping_net.style_dim).to(self.device_info.device)
+            style = self.mapping_net(var)
+            return style
+
         if self.w_size == 1:
             style = self.mapping_net(batch["noise"])
         else:
-            var = torch.randn(self.cfg.batch_size // 2, self.mapping_net.style_dim).to(self.device_info.device)
-            style = self.mapping_net(var).unsqueeze(1).repeat(1, self.w_size, 1)
-            bs = self.cfg.batch_size - bs
-            var = torch.randn(bs * self.w_size, self.mapping_net.style_dim).to(self.device_info.device)
-            style_ext = self.mapping_net(var).view(-1, self.w_size, self.mapping_net.style_dim)
-            style = torch.cat([style, style_ext], dim=0)
+            style_a, style_b = make_style(), make_style()
+            inject_index = random.randint(1, self.w_size - 1)
+            style_a = style_a.unsqueeze(1).repeat(1, inject_index, 1)
+            style_b = style_b.unsqueeze(1).repeat(1, self.w_size - inject_index, 1)
+            style = torch.cat([style_a, style_b], dim=1)
             # style = self.mapping_net(batch["noise"].view(-1, self.mapping_net.style_dim))
             # style = style.view(-1, self.w_size, self.mapping_net.style_dim)
         if self.cfg.truncated:
