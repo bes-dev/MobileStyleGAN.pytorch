@@ -128,8 +128,14 @@ class Distiller(pl.LightningModule):
         if self.w_size == 1:
             style = self.mapping_net(batch["noise"])
         else:
-            style = self.mapping_net(batch["noise"].view(-1, self.mapping_net.style_dim))
-            style = style.view(-1, self.w_size, self.mapping_net.style_dim)
+            var = torch.randn(self.cfg.batch_size // 2, self.mapping_net.style_dim).to(self.device_info.device)
+            style = self.mapping_net(var).unsqueeze(1).repeat(1, self.w_size, 1)
+            bs = self.cfg.batch_size - bs
+            var = torch.randn(bs * self.w_size, self.mapping_net.style_dim).to(self.device_info.device)
+            style_ext = self.mapping_net(var).view(-1, self.w_size, self.mapping_net.style_dim)
+            style = torch.cat([style, style_ext], dim=0)
+            # style = self.mapping_net(batch["noise"].view(-1, self.mapping_net.style_dim))
+            # style = style.view(-1, self.w_size, self.mapping_net.style_dim)
         if self.cfg.truncated:
             style = self.style_mean + 0.5 * (style - self.style_mean)
         gt = self.synthesis_net(style)
