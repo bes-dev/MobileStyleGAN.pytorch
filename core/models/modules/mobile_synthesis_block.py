@@ -39,8 +39,11 @@ class MobileSynthesisBlock(nn.Module):
         )
 
     def forward(self, hidden, style, noise=[None, None]):
-        hidden = self.up(hidden, style)
-        hidden = self.conv1(hidden, style, noise=noise[0])
-        hidden = self.conv2(hidden, style, noise=noise[1])
-        img = self.to_img(hidden, style)
+        hidden = self.up(hidden, style if style.ndim == 2 else style[:, 0, :])
+        hidden = self.conv1(hidden, style if style.ndim == 2 else style[:, 0, :], noise=noise[0])
+        hidden = self.conv2(hidden, style if style.ndim == 2 else style[:, 1, :], noise=noise[1])
+        img = self.to_img(hidden, style if style.ndim == 2 else style[:, 2, :])
         return hidden, img
+
+    def wsize(self):
+        return 3

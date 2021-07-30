@@ -44,6 +44,7 @@
         "max_epochs": 100,
         "mode": "g,d",
         "reg_d_interval": 16,
-        "truncated": false
+        "truncated": false,
+        "w_plus": false
     }
 }

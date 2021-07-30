@@ -26,12 +26,7 @@ class Distiller(pl.LightningModule):
         super().__init__()
         self.cfg = cfg.trainer
 
-        # dataset
-        self.trainset = NoiseDataset(batch_size=self.cfg.batch_size, **cfg.trainset)
-        self.valset = NoiseDataset(batch_size=self.cfg.batch_size, **cfg.valset)
-
         # teacher model
-        # teacher_ckpt = model_zoo(**cfg.teacher)
         print("load mapping network...")
         mapping_net_ckpt = model_zoo(**cfg.teacher.mapping_network)
         self.mapping_net = MappingNetwork(**mapping_net_ckpt["params"]).eval()
@@ -40,16 +35,21 @@ class Distiller(pl.LightningModule):
         synthesis_net_ckpt = model_zoo(**cfg.teacher.synthesis_network)
         self.synthesis_net = SynthesisNetwork(**synthesis_net_ckpt["params"]).eval()
         self.synthesis_net.load_state_dict(synthesis_net_ckpt["ckpt"])
-        #compute style_mean
-        self.register_buffer(
-            "style_mean",
-            self.mapping_net(torch.randn(4096, self.mapping_net.style_dim).mean(0, keepdim=True))
-        )
-
         # student network
         self.student = MobileSynthesisNetwork(
             style_dim=self.mapping_net.style_dim,
             channels=synthesis_net_ckpt["params"]["channels"][:-1]
+        )
+
+        # dataset
+        self.w_size = 1 if not self.cfg.w_plus else self.student.wsize()
+        self.trainset = NoiseDataset(batch_size=self.cfg.batch_size, w_size=self.w_size, **cfg.trainset)
+        self.valset = NoiseDataset(batch_size=self.cfg.batch_size, w_size=self.w_size, **cfg.valset)
+
+        #compute style_mean
+        self.register_buffer(
+            "style_mean",
+            self.compute_mean_style(style_dim, w_size=self.w_size, batch_size=4096)
         )
 
         # loss
@@ -125,11 +125,23 @@ class Distiller(pl.LightningModule):
 
     @torch.no_grad()
     def make_sample(self, batch):
-        style = self.mapping_net(batch["noise"])
+        if self.w_size == 1:
+            style = self.mapping_net(batch["noise"])
+        else:
+            style = self.mapping_net(batch["noise"].view(-1, self.mapping_net.style_dim))
+            style = style.view(-1, self.w_size, self.mapping_net.style_dim)
         if self.cfg.truncated:
             style = self.style_mean + 0.5 * (style - self.style_mean)
         gt = self.synthesis_net(style)
         return style, gt
+
+    @torch.no_grad()
+    def compute_mean_style(self, style_dim, w_size=1, batch_size=4096):
+        style = self.mapping_net(torch.randn(4096 * w_size, self.mapping_net.style_dim))
+        if w_size != 1:
+            style = style.view(batch_size, w_size, style_dim)
+        style = style.mean(0, keepdim=True)
+        return style
 
     def train_dataloader(self):
         return torch.utils.data.DataLoader(self.trainset, batch_size=self.trainset.batch_size, num_workers=self.cfg.num_workers, shuffle=False)
