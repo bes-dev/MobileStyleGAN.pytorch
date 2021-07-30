@@ -45,6 +45,6 @@
         "mode": "g,d",
         "reg_d_interval": 16,
         "truncated": false,
-        "w_plus": false
+        "w_plus": true
     }
 }

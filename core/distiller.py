@@ -49,7 +49,7 @@ class Distiller(pl.LightningModule):
         #compute style_mean
         self.register_buffer(
             "style_mean",
-            self.compute_mean_style(style_dim, w_size=self.w_size, batch_size=4096)
+            self.compute_mean_style(self.mapping_net.style_dim, w_size=self.w_size, batch_size=4096)
         )
 
         # loss
