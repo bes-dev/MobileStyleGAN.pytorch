@@ -46,13 +46,13 @@ class Distiller(pl.LightningModule):
         # dataset
         # self.w_size = 1 if not self.cfg.w_plus else self.student.wsize()
         self.wsize = self.student.wsize()
-        self.trainset = NoiseDataset(batch_size=self.cfg.batch_size, w_size=self.w_size, **cfg.trainset)
-        self.valset = NoiseDataset(batch_size=self.cfg.batch_size, w_size=self.w_size, **cfg.valset)
+        self.trainset = NoiseDataset(batch_size=self.cfg.batch_size, wsize=self.wsize, **cfg.trainset)
+        self.valset = NoiseDataset(batch_size=self.cfg.batch_size, wsize=self.wsize, **cfg.valset)
 
         #compute style_mean
         self.register_buffer(
             "style_mean",
-            self.compute_mean_style(self.mapping_net.style_dim, w_size=self.w_size, batch_size=4096)
+            self.compute_mean_style(self.mapping_net.style_dim, wsize=self.wsize, batch_size=4096)
         )
 
         # loss
