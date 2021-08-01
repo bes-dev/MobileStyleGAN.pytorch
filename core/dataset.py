@@ -11,5 +11,7 @@ class NoiseDataset(torch.utils.data.Dataset):
         return self.batch_size * self.n_batches
 
     def __getitem__(self, idx):
-        shape = (self.emb_size, ) if self.w_size == 1 else (self.w_size, self.emb_size)
-        return {"noise": torch.randn(shape)}
+        noise = torch.randn(self.emb_size)
+        if self.w_size > 1:
+            noise = noise.unsqueeze(0).repeat(self.w_size, 1)
+        return {"noise": noise}

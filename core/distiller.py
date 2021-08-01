@@ -44,7 +44,8 @@ class Distiller(pl.LightningModule):
         )
 
         # dataset
-        self.w_size = 1 if not self.cfg.w_plus else self.student.wsize()
+        # self.w_size = 1 if not self.cfg.w_plus else self.student.wsize()
+        self.wsize = self.student.wsize()
         self.trainset = NoiseDataset(batch_size=self.cfg.batch_size, w_size=self.w_size, **cfg.trainset)
         self.valset = NoiseDataset(batch_size=self.cfg.batch_size, w_size=self.w_size, **cfg.valset)
 
@@ -132,26 +133,30 @@ class Distiller(pl.LightningModule):
             style = self.mapping_net(var)
             return style
 
-        if self.w_size == 1:
+        coin = random.random()
+        if coin >= self.cfg.p_stylemix[1]:
             style = self.mapping_net(batch["noise"])
-        else:
+        elif coin >= self.cfg.p_stylemix[0] and coin < self.cfg.p_stylemix[1]:
             style_a, style_b = make_style(), make_style()
-            inject_index = random.randint(1, self.w_size - 1)
+            inject_index = random.randint(1, self.wsize - 1)
             style_a = style_a.unsqueeze(1).repeat(1, inject_index, 1)
-            style_b = style_b.unsqueeze(1).repeat(1, self.w_size - inject_index, 1)
+            style_b = style_b.unsqueeze(1).repeat(1, self.wsize - inject_index, 1)
             style = torch.cat([style_a, style_b], dim=1)
-            # style = self.mapping_net(batch["noise"].view(-1, self.mapping_net.style_dim))
-            # style = style.view(-1, self.w_size, self.mapping_net.style_dim)
+        else:
+            var = torch.randn(self.wsize, self.mapping_net.style_dim)
+            style = self.mapping_net(var).view(1, self.wsize, self.mapping_net.style_dim)
+
         if self.cfg.truncated:
             style = self.style_mean + 0.5 * (style - self.style_mean)
+
         gt = self.synthesis_net(style)
         return style, gt
 
     @torch.no_grad()
-    def compute_mean_style(self, style_dim, w_size=1, batch_size=4096):
-        style = self.mapping_net(torch.randn(4096 * w_size, self.mapping_net.style_dim))
-        if w_size != 1:
-            style = style.view(batch_size, w_size, style_dim)
+    def compute_mean_style(self, style_dim, wsize=1, batch_size=4096):
+        style = self.mapping_net(torch.randn(4096 * wsize, self.mapping_net.style_dim))
+        if wsize != 1:
+            style = style.view(batch_size, wsize, style_dim)
         style = style.mean(0, keepdim=True)
         return style
 
