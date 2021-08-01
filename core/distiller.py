@@ -143,7 +143,7 @@ class Distiller(pl.LightningModule):
             style_b = style_b.unsqueeze(1).repeat(1, self.wsize - inject_index, 1)
             style = torch.cat([style_a, style_b], dim=1)
         else:
-            var = torch.randn(self.wsize, self.mapping_net.style_dim)
+            var = torch.randn(self.wsize, self.mapping_net.style_dim).to(self.device_info.device)
             style = self.mapping_net(var).view(1, self.wsize, self.mapping_net.style_dim)
 
         if self.cfg.truncated:
