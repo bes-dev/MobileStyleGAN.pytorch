@@ -106,4 +106,14 @@ If you are using the results and code of this work, please cite it as:
       archivePrefix={arXiv},
       primaryClass={cs.CV}
 }
+
+@article{BELOUSOV2021100115,
+      title = {MobileStyleGAN.pytorch: PyTorch-based toolkit to compress StyleGAN2 model},
+      journal = {Software Impacts},
+      year = {2021},
+      issn = {2665-9638},
+      doi = {https://doi.org/10.1016/j.simpa.2021.100115},
+      url = {https://www.sciencedirect.com/science/article/pii/S2665963821000452},
+      author = {Sergei Belousov},
+}
 ```
