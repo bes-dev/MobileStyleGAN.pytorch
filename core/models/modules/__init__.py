@@ -6,3 +6,6 @@ from .modulated_conv2d import *
 from .multichannel_image import *
 from .noise_injection import *
 from .styled_conv2d import *
+from .equal_conv2d import *
+from .equal_linear import *
+from .blur import *

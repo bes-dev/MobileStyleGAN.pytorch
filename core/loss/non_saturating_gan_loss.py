@@ -2,7 +2,7 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 from torch.autograd import grad
-from core.models.discriminator import Discriminator
+from core.models.discriminator_msg import Discriminator
 from .diffaug import get_default_transforms
 
 
