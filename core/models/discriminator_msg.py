@@ -20,7 +20,7 @@ class ConvLayer(nn.Module):
 
 
 class Discriminator(nn.Module):
-    def __init__(self, ch_in):
+    def __init__(self, channels_in=3, **kwargs):
         super().__init__()
 
         def conv_bn(inp, oup, stride):
@@ -40,7 +40,7 @@ class Discriminator(nn.Module):
             )
 
         self.model = nn.Sequential(
-            conv_bn(ch_in, 32, 2),
+            conv_bn(channels_in, 32, 2),
             conv_dw(32, 64, 1),
             conv_dw(64, 128, 2),
             conv_dw(128, 128, 1),
