@@ -17,10 +17,10 @@
     },
     "teacher": {
         "mapping_network": {
-            "name": "stylegan2_ffhq_config_f_mapping_network.ckpt"
+            "name": ""
         },
         "synthesis_network": {
-            "name": "stylegan2_ffhq_config_f_synthesis_network.ckpt"
+            "name": ""
         }
     },
     "distillation_loss": {

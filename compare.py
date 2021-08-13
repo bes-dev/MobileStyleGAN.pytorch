@@ -10,7 +10,7 @@ from core.model_zoo import model_zoo
 def main(args):
     cfg = load_cfg(args.cfg)
     distiller = Distiller(cfg)
-    if args.ckpt is not "":
+    if args.ckpt != "":
         ckpt = model_zoo(args.ckpt)
         load_weights(distiller, ckpt["state_dict"])
 

@@ -37,6 +37,12 @@ def load_cfg(path):
     return cfg
 
 
+def save_cfg(path, cfg):
+    with open(path, 'w') as stream:
+        json.dump(cfg, stream, indent=4)
+    return cfg
+
+
 def select_weights(ckpt, prefix="student."):
     _ckpt = {}
     for k, v in ckpt.items():
