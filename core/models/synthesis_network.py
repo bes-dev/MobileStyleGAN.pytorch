@@ -31,9 +31,9 @@ class SynthesisBlock(nn.Module):
         self.to_rgb = ToRGB(out_channel, style_dim)
 
     def forward(self, hidden, style, noise=[None, None]):
-        hidden = self.conv1(hidden, style, noise=noise[0])
-        hidden = self.conv2(hidden, style, noise=noise[1])
-        rgb = self.to_rgb(hidden, style)
+        hidden = self.conv1(hidden, style if style.ndim == 2 else style[:, 0, :], noise=noise[0])
+        hidden = self.conv2(hidden, style if style.ndim == 2 else style[:, 1, :], noise=noise[1])
+        rgb = self.to_rgb(hidden, style if style.ndim == 2 else style[:, 2, :])
         return hidden, rgb
 
 
@@ -80,8 +80,8 @@ class SynthesisNetwork(nn.Module):
         else:
             _noise = noise[0]
         out["noise"].append(_noise)
-        hidden = self.conv1(hidden, style, noise=_noise)
-        img = self.to_rgb1(hidden, style)
+        hidden = self.conv1(hidden, style if style.ndim == 2 else style[:, 0, :], noise=_noise)
+        img = self.to_rgb1(hidden, style if style.ndim == 2 else style[:, 1, :])
         out["rgb"].append(img)
 
         for i, m in enumerate(self.layers):
@@ -91,9 +91,13 @@ class SynthesisNetwork(nn.Module):
             else:
                 _noise = noise[i + 1]
             out["noise"].append(_noise)
+            _style = style if style.ndim == 2 else style[:, 3*i+1:3*i+4, :]
             hidden, rgb = m(hidden, style, _noise)
             out["rgb"].append(rgb)
             img = self.upsample(img) + rgb
 
         out["img"] = img
         return out
+
+    def wsize(self):
+        return len(self.layers) * 3 + 2

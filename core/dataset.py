@@ -10,4 +10,5 @@ class NoiseDataset(torch.utils.data.Dataset):
         return self.batch_size * self.n_batches
 
     def __getitem__(self, idx):
-        return {"noise": torch.randn(self.emb_size)}
+        noise = torch.randn(self.emb_size)
+        return {"noise": noise}

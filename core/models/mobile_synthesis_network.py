@@ -56,13 +56,14 @@ class MobileSynthesisNetwork(nn.Module):
 
         hidden = self.input(style)
         out["noise"].append(noise(hidden.size(-1)))
-        hidden = self.conv1(hidden, style, noise=out["noise"][-1])
-        img = self.to_img1(hidden, style)
+        hidden = self.conv1(hidden, style if style.ndim == 2 else style[:, 0, :], noise=out["noise"][-1])
+        img = self.to_img1(hidden, style if style.ndim == 2 else style[:, 1, :])
         out["freq"].append(img)
 
         for i, m in enumerate(self.layers):
             out["noise"].append(noise(2 ** (i + 3), 2))
-            hidden, freq = m(hidden, style, noise=out["noise"][-1])
+            _style = style if style.ndim == 2 else style[:, m.wsize()*i + 1: m.wsize()*i + m.wsize() + 1, :]
+            hidden, freq = m(hidden, _style, noise=out["noise"][-1])
             out["freq"].append(freq)
 
         out["img"] = self.dwt_to_img(out["freq"][-1])
@@ -73,3 +74,6 @@ class MobileSynthesisNetwork(nn.Module):
         low = img[:, :3, :, :]
         high = img[:, 3:, :, :].view(b, 3, 3, h, w)
         return self.idwt((low, [high]))
+
+    def wsize(self):
+        return len(self.layers) * self.layers[0].wsize() + 2
