@@ -19,7 +19,7 @@ def main(args):
     distiller = distiller.to(args.device)
     for i in tqdm(range(args.n_batches)):
         var = torch.randn(args.batch_size, distiller.mapping_net.style_dim).to(args.device)
-        img_s = distiller(var, truncated=args.truncated)
+        img_s = distiller(var, truncated=args.truncated, generator=args.generator)
         for j in range(img_s.size(0)):
             cv2.imwrite(
                 os.path.join(args.output_path, f"{i*args.batch_size + j}.png"),
@@ -37,5 +37,6 @@ if __name__ == "__main__":
     parser.add_argument("--output-path", type=str, default="./", help="path to store images")
     parser.add_argument("--batch-size", type=int, default=10, help="batch size")
     parser.add_argument("--n-batches", type=int, default=5000, help="number of batches")
+    parser.add_argument("--generator", type=str, default="student", help="generator mode: [student|teacher]")
     args = parser.parse_args()
     main(args)

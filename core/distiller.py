@@ -180,12 +180,15 @@ class Distiller(pl.LightningModule):
                 self.opt_to_mode[i] = "d"
         return opts, []
 
-    def forward(self, var, truncated=False):
+    def forward(self, var, truncated=False, generator="student"):
         var = var.to(self.device_info.device)
         style = self.mapping_net(var)
         if truncated:
             style = self.style_mean + 0.5 * (style - self.style_mean)
-        img = self.student(style)["img"]
+        if generator == "student":
+            img = self.student(style)["img"]
+        else:
+            img = self.synthesis_net(style)["img"]
         return img
 
     def simultaneous_forward(self, var, truncated=False):

@@ -28,7 +28,15 @@ Our framework supports StyleGAN2 checkpoints format from [rosinality/stylegan2-p
 To convert ckpt your own checkpoint of StyleGAN2 to our framework:
 
 ```bash
-python convert_rosinality_ckpt.py --ckpt <path_to_rosinality_stylegan2_ckpt> --ckpt-mnet <path_to_output_mapping_network_ckpt> --ckpt-snet <path_to_output_synthesis_network_ckpt>
+python convert_rosinality_ckpt.py --ckpt <path_to_rosinality_stylegan2_ckpt> --ckpt-mnet <path_to_output_mapping_network_ckpt> --ckpt-snet <path_to_output_synthesis_network_ckpt> --cfg-path <path_to_output_config_json>
+```
+
+### Check converted checkpoint
+
+To check that your checkpoint is converted correctly, just run demo visualization:
+
+```bash
+python demo.py --cfg <path_to_output_config_json> --ckpt "" --generator teacher
 ```
 
 ## Generate images using MobileStyleGAN
@@ -105,5 +113,15 @@ If you are using the results and code of this work, please cite it as:
       eprint={2104.04767},
       archivePrefix={arXiv},
       primaryClass={cs.CV}
+}
+
+@article{BELOUSOV2021100115,
+      title = {MobileStyleGAN.pytorch: PyTorch-based toolkit to compress StyleGAN2 model},
+      journal = {Software Impacts},
+      year = {2021},
+      issn = {2665-9638},
+      doi = {https://doi.org/10.1016/j.simpa.2021.100115},
+      url = {https://www.sciencedirect.com/science/article/pii/S2665963821000452},
+      author = {Sergei Belousov},
 }
 ```

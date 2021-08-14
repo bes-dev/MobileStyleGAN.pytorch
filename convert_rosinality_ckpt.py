@@ -1,7 +1,7 @@
 import argparse
 import os
 import torch
-from core.utils import select_weights
+from core.utils import select_weights, load_cfg, save_cfg
 from core.models.mapping_network import MappingNetwork
 from core.models.synthesis_network import SynthesisNetwork, SynthesisBlock
 
@@ -67,12 +67,22 @@ def extract_snet(ckpt, style_dim, ckpt_path):
     }, ckpt_path)
 
 
+def create_config(cfg_path, ckpt_mnet, ckpt_snet):
+    cfg = load_cfg("configs/template_cfg.json")
+    cfg.teacher.mapping_network.name = ckpt_mnet
+    cfg.teacher.synthesis_network.name = ckpt_snet
+    save_cfg(cfg_path, cfg)
+
+
 def main(args):
     ckpt = torch.load(args.ckpt, map_location="cpu")
-    print("extract mapping network")
+    print(f"extract mapping network to {args.ckpt_mnet}")
     style_dim = extract_mnet(ckpt, args.ckpt_mnet)
-    print("extract synthesis network")
+    print(f"extract synthesis network to {args.ckpt_snet}")
     extract_snet(ckpt, style_dim, args.ckpt_snet)
+    if args.cfg_path != "":
+        print(f"generate config: {args.cfg_path}")
+        create_config(args.cfg_path, args.ckpt_mnet, args.ckpt_snet)
 
 
 if __name__ == "__main__":
@@ -81,5 +91,6 @@ if __name__ == "__main__":
     parser.add_argument("--ckpt", type=str, help="path to input ckpt")
     parser.add_argument("--ckpt-mnet", type=str, help="path to output mapping_network ckpt")
     parser.add_argument("--ckpt-snet", type=str, help="path to output synthesis_network ckpt")
+    parser.add_argument("--cfg-path", type=str, default="", help="path to output config file")
     args = parser.parse_args()
     main(args)
