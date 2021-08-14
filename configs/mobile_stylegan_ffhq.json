@@ -45,7 +45,6 @@
         "mode": "g,d",
         "reg_d_interval": 16,
         "truncated": false,
-        "w_plus": true,
-        "p_stylemix": [0.1, 0.7]
+        "stylemix_p": [0.0, 0.0]
     }
 }
