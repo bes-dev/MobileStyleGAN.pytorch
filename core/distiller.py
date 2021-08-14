@@ -43,7 +43,7 @@ class Distiller(pl.LightningModule):
         #compute style_mean
         self.register_buffer(
             "style_mean",
-            self.mapping_net(torch.randn(4096, self.mapping_net.style_dim).mean(0, keepdim=True))
+            self.mapping_net(torch.randn(4096, self.mapping_net.style_dim)).mean(0, keepdim=True)
         )
 
         # student network
