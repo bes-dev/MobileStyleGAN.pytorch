@@ -153,10 +153,9 @@ class Distiller(pl.LightningModule):
 
     @torch.no_grad()
     def compute_mean_style(self, style_dim, wsize=1, batch_size=4096):
-        style = self.mapping_net(torch.randn(4096 * wsize, self.mapping_net.style_dim))
+        style = self.mapping_net(torch.randn(4096, self.mapping_net.style_dim)).mean(0, keepdim=True)
         if wsize != 1:
-            style = style.view(batch_size, wsize, style_dim)
-        style = style.mean(0, keepdim=True)
+            style = style.unsqueeze(1).repeat(1, wsize, 1)
         return style
 
     def train_dataloader(self):
