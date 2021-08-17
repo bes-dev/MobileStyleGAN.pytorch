@@ -3,8 +3,8 @@ import torch.nn as nn
 from .styled_conv2d import *
 from .multichannel_image import *
 from .modulated_conv2d import *
-from .idwt_upsample import *
-
+# from .idwt_upsample import *
+from .wavelet_haar import WaveletHaar2D
 
 class MobileSynthesisBlock(nn.Module):
     def __init__(
@@ -16,7 +16,9 @@ class MobileSynthesisBlock(nn.Module):
             conv_module=ModulatedConv2d
     ):
         super().__init__()
-        self.up = IDWTUpsaplme(channels_in, style_dim)
+        # self.up = IDWTUpsaplme(channels_in, style_dim)
+        # self.up = nn.PixelShuffle(2)
+        self.up = WaveletHaar2D()
         self.conv1 = StyledConv2d(
             channels_in // 4,
             channels_out,
@@ -39,7 +41,8 @@ class MobileSynthesisBlock(nn.Module):
         )
 
     def forward(self, hidden, style, noise=[None, None]):
-        hidden = self.up(hidden, style if style.ndim == 2 else style[:, 0, :])
+        # hidden = self.up(hidden, style if style.ndim == 2 else style[:, 0, :])
+        hidden = self.up(hidden, mode="inverse")
         hidden = self.conv1(hidden, style if style.ndim == 2 else style[:, 0, :], noise=noise[0])
         hidden = self.conv2(hidden, style if style.ndim == 2 else style[:, 1, :], noise=noise[1])
         img = self.to_img(hidden, style if style.ndim == 2 else style[:, 2, :])

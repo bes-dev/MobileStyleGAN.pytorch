@@ -4,7 +4,7 @@ import torch.nn.functional as F
 from core.loss.non_saturating_gan_loss import NonSaturatingGANLoss
 from core.loss.perceptual_loss import PerceptualLoss
 from pytorch_wavelets import DWTInverse, DWTForward
-
+from core.models.modules import WaveletHaar2D
 
 class DistillerLoss(nn.Module):
     def __init__(
@@ -24,16 +24,19 @@ class DistillerLoss(nn.Module):
         # loss weights
         self.loss_weights = loss_weights
         # utils
-        self.dwt = DWTForward(J=1, mode='zero', wave='db1')
-        self.idwt = DWTInverse(mode="zero", wave="db1")
+        # self.dwt = DWTForward(J=1, mode='zero', wave='db1')
+        # self.idwt = DWTInverse(mode="zero", wave="db1")
+        self.wavelet = WaveletHaar2D()
 
     def loss_g(self, pred, gt):
         # l1/l2 loss
         loss = {"l1": 0, "l2": 0}
         for _pred in pred["freq"]:
-            _pred_rgb = self.dwt_to_img(_pred)
+            # _pred_rgb = self.dwt_to_img(_pred)
+            _pred_rgb = self.wavelet(_pred, mode="inverse")
             _gt_rgb = F.interpolate(gt["img"], size=_pred_rgb.size(-1), mode='bilinear', align_corners=True)
-            _gt_freq = self.img_to_dwt(_gt_rgb)
+            # _gt_freq = self.img_to_dwt(_gt_rgb)
+            _gt_freq = self.wavelet(_gt_rgb, mode="forward")
             loss["l1"] += self.l1_loss(_pred_rgb, _gt_rgb)
             loss["l2"] += self.l2_loss(_pred_rgb, _gt_rgb)
             loss["l1"] += self.l1_loss(_pred, _gt_freq)
@@ -62,15 +65,15 @@ class DistillerLoss(nn.Module):
         out["loss"] = out["d_reg"] = self.gan_loss.reg_d(real["img"])
         return out
 
-    def img_to_dwt(self, img):
-        low, high = self.dwt(img)
-        b, _, _, h, w = high[0].size()
-        high = high[0].view(b, -1, h, w)
-        freq = torch.cat([low, high], dim=1)
-        return freq
+    # def img_to_dwt(self, img):
+    #     low, high = self.dwt(img)
+    #     b, _, _, h, w = high[0].size()
+    #     high = high[0].view(b, -1, h, w)
+    #     freq = torch.cat([low, high], dim=1)
+    #     return freq
 
-    def dwt_to_img(self, img):
-        b, c, h, w = img.size()
-        low = img[:, :3, :, :]
-        high = img[:, 3:, :, :].view(b, 3, 3, h, w)
-        return self.idwt((low, [high]))
+    # def dwt_to_img(self, img):
+    #     b, c, h, w = img.size()
+    #     low = img[:, :3, :, :]
+    #     high = img[:, 3:, :, :].view(b, 3, 3, h, w)
+    #     return self.idwt((low, [high]))

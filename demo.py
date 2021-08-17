@@ -15,6 +15,14 @@ def main(args):
         ckpt = model_zoo(args.ckpt)
         load_weights(distiller, ckpt["state_dict"])
 
+    def dense_mode(mode=True):
+        def _dense_mode(m):
+            if hasattr(m, "dense_mode"):
+                m.dense_mode = mode
+        return _dense_mode
+
+    distiller.student.apply(dense_mode(False))
+
     while True:
         var = torch.randn(1, distiller.mapping_net.style_dim)
         img_s = distiller(var, truncated=args.truncated, generator=args.generator)

@@ -6,7 +6,8 @@ from .modules import StyledConv2d, \
     MultichannelIamge, \
     ModulatedDWConv2d, \
     MobileSynthesisBlock, \
-    DWTInverse
+    DWTInverse, \
+    WaveletHaar2D
 
 
 class MobileSynthesisNetwork(nn.Module):
@@ -46,7 +47,8 @@ class MobileSynthesisNetwork(nn.Module):
             )
             channels_in = channels_out
 
-        self.idwt = DWTInverse(mode="zero", wave="db1")
+        # self.idwt = DWTInverse(mode="zero", wave="db1")
+        self.wavelet = WaveletHaar2D()
         self.register_buffer("device_info", torch.zeros(1))
         self.trace_model = False
 
@@ -66,7 +68,8 @@ class MobileSynthesisNetwork(nn.Module):
             hidden, freq = m(hidden, _style, noise=out["noise"][-1])
             out["freq"].append(freq)
 
-        out["img"] = self.dwt_to_img(out["freq"][-1])
+        # out["img"] = self.dwt_to_img(out["freq"][-1])
+        out["img"] = self.wavelet(out["freq"][-1], mode="inverse")
         return out
 
     def dwt_to_img(self, img):
