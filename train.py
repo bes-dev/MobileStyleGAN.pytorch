@@ -20,22 +20,21 @@ def main(args):
         load_weights(distiller, ckpt["state_dict"])
     logger = build_logger(cfg.logger)
     checkpoint_callback = pl.callbacks.ModelCheckpoint(
-        filepath=os.getcwd() if args.checkpoint_dir is None else args.checkpoint_dir,
+        dirpath=os.getcwd() if args.checkpoint_dir is None else args.checkpoint_dir,
         save_top_k=True,
         save_last=True,
         verbose=True,
         monitor=cfg.trainer.monitor,
-        mode=cfg.trainer.monitor_mode,
-        prefix=''
+        mode=cfg.trainer.monitor_mode
     )
     trainer = pl.Trainer(
         gpus=args.gpus,
         max_epochs=cfg.trainer.max_epochs,
         accumulate_grad_batches=args.grad_batches,
         distributed_backend=args.distributed_backend,
-        checkpoint_callback=checkpoint_callback,
         val_check_interval=args.val_check_interval,
-        logger=logger
+        logger=logger,
+        callbacks=[checkpoint_callback]
     )
     if args.export_model is None:
         trainer.fit(distiller)
