@@ -40,9 +40,9 @@ def main(args):
     if args.export_model is None:
         trainer.fit(distiller)
     elif args.export_model == "onnx":
-        distiller.to_onnx(args.export_dir)
+        distiller.to_onnx(args.export_dir, args.export_w_plus)
     elif args.export_model == "coreml":
-        distiller.to_coreml(args.export_dir)
+        distiller.to_coreml(args.export_dir, args.export_w_plus)
     else:
         raise "Unknown export format."
 
@@ -60,5 +60,6 @@ if __name__ == "__main__":
     parser.add_argument("--cfg", type=str, help="path to config file")
     parser.add_argument("--export-model", type=str, default=None, help="export model for deploy. ['onnx', 'coreml']")
     parser.add_argument("--export-dir", type=str, default="./", help="path to export model")
+    parser.add_argument("--export-w-plus", action='store_true', help="export with W+ space")
     args = parser.parse_args()
     main(args)

@@ -199,7 +199,7 @@ class Distiller(pl.LightningModule):
         img_s = self.student(style, noise=out_t["noise"])["img"]
         return img_s, out_t["img"]
 
-    def to_onnx(self, output_dir):
+    def to_onnx(self, output_dir, w_plus=False):
         class Wrapper(nn.Module):
             def __init__(
                     self,
@@ -214,8 +214,13 @@ class Distiller(pl.LightningModule):
                 return self.m(style, noise=self.noise)["img"]
 
         print("prepare style...")
-        var = torch.randn(1, self.mapping_net.style_dim).to(self.device_info.device)
-        style = self.mapping_net(var)
+        if not w_plus:
+            var = torch.randn(1, self.mapping_net.style_dim).to(self.device_info.device)
+            style = self.mapping_net(var)
+        else:
+            var = torch.randn(self.wsize, self.mapping_net.style_dim).to(self.device_info.device)
+            style = self.mapping_net(var)
+            style = style.view(1, self.wsize, -1)
 
         print("convert mapping network...")
         self.mapping_net.apply(apply_trace_model_mode(True))
@@ -239,12 +244,17 @@ class Distiller(pl.LightningModule):
             verbose=True
         )
 
-    def to_coreml(self, output_dir):
+    def to_coreml(self, output_dir, w_plus=False):
         import coremltools as ct
 
         print("prepare style...")
-        var = torch.randn(1, self.mapping_net.style_dim).to(self.device_info.device)
-        style = self.mapping_net(var)
+        if not w_plus:
+            var = torch.randn(1, self.mapping_net.style_dim).to(self.device_info.device)
+            style = self.mapping_net(var)
+        else:
+            var = torch.randn(self.wsize, self.mapping_net.style_dim).to(self.device_info.device)
+            style = self.mapping_net(var)
+            style = style.view(1, self.wsize, -1)
 
         print("convert mapping network...")
         self.mapping_net.apply(apply_trace_model_mode(True))
