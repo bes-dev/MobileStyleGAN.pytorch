@@ -7,7 +7,6 @@ from core.utils import load_cfg, load_weights, tensor_to_img
 from core.distiller import Distiller
 from core.model_zoo import model_zoo
 
-
 def main(args):
     cfg = load_cfg(args.cfg)
     distiller = Distiller(cfg)

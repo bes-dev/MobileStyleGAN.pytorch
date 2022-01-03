@@ -24,6 +24,7 @@
         }
     },
     "distillation_loss": {
+        "enable_mask": true,
         "perceptual_size": 256,
         "loss_weights": {
             "l1": 1.0,

@@ -3,6 +3,7 @@ import torch.nn as nn
 import torch.nn.functional as F
 from core.loss.non_saturating_gan_loss import NonSaturatingGANLoss
 from core.loss.perceptual_loss import PerceptualLoss
+from core.loss.content_aware_mask import ContentAwareMask
 from pytorch_wavelets import DWTInverse, DWTForward
 
 
@@ -10,10 +11,13 @@ class DistillerLoss(nn.Module):
     def __init__(
             self,
             discriminator_size,
+            enable_mask=False,
             perceptual_size=256,
             loss_weights={"l1": 1.0, "l2": 1.0, "loss_p": 1.0, "loss_g": 0.5}
     ):
         super().__init__()
+        # content-aware mask
+        self.mask = ContentAwareMask(enable_mask)
         # l1/l2 loss
         self.l1_loss = nn.L1Loss()
         self.l2_loss = nn.MSELoss()
@@ -41,7 +45,9 @@ class DistillerLoss(nn.Module):
         # perceptual_loss
         loss["loss_p"] = self.perceptual_loss(pred["img"], gt["img"])
         # gan loss
-        loss["loss_g"] = self.gan_loss.loss_g(pred["img"], gt["img"])
+        with torch.no_grad():
+            mask = self.mask(gt["img"]).detach()
+        loss["loss_g"] = self.gan_loss.loss_g(pred["img"] * mask, gt["img"] * mask)
 
         # total loss
         loss["loss"] = 0
@@ -54,12 +60,16 @@ class DistillerLoss(nn.Module):
 
     def loss_d(self, pred, gt):
         loss = {}
-        loss["loss"] = loss["loss_d"] = self.gan_loss.loss_d(pred["img"].detach(), gt["img"])
+        with torch.no_grad():
+            mask = self.mask(gt["img"]).detach()
+        loss["loss"] = loss["loss_d"] = self.gan_loss.loss_d(pred["img"].detach() * mask, gt["img"] * mask)
         return loss
 
     def reg_d(self, real):
         out = {}
-        out["loss"] = out["d_reg"] = self.gan_loss.reg_d(real["img"])
+        with torch.no_grad():
+            mask = self.mask(gt["img"]).detach()
+        out["loss"] = out["d_reg"] = self.gan_loss.reg_d(real["img"] * mask)
         return out
 
     def img_to_dwt(self, img):
