@@ -100,6 +100,7 @@ We want to thank the people whose works contributed to our project::
 * Tero Karras, Samuli Laine, Miika Aittala, Janne Hellsten, Jaakko Lehtinen, Timo Aila for research related to style based generative models.
 * Kim Seonghyeon for implementation of StyleGAN2 in [PyTorch](https://github.com/rosinality/stylegan2-pytorch).
 * Fergal Cotter for implementation of Discrete Wavelet Transforms and Inverse Discrete Wavelet Transforms in [PyTorch](https://github.com/fbcotter/pytorch_wavelets).
+* Cyril Diagne for the excellent [demo of how to run MobileStyleGAN directly into the web-browser](https://github.com/cyrildiagne/mobilestylegan-web-demo).
 
 ## Citation
 
