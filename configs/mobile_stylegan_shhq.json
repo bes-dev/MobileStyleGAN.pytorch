@@ -42,6 +42,7 @@
         "max_epochs": 100,
         "mode": "g,d",
         "reg_d_interval": 16,
+        "reg_g_interval": 4,
         "truncated": false,
         "stylemix_p": [0.0, 0.0]
     }

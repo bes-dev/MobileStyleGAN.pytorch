@@ -113,7 +113,11 @@ class Distiller(pl.LightningModule):
     def generator_step(self, batch, batch_nb):
         style, gt = self.make_sample(batch)
         pred = self.student(style, noise=gt["noise"])
-        loss = self.loss.loss_g(pred, gt)
+        if self.global_step % self.cfg.reg_g_interval != 0:
+            loss = self.loss.loss_g(pred, gt)
+        else:
+            loss = self.loss.reg_d(pred, style)
+            loss["loss"] *= self.cfg.reg_d_interval
         return loss
 
     def discriminator_step(self, batch, batch_nb):

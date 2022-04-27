@@ -3,6 +3,7 @@ import torch.nn as nn
 import torch.nn.functional as F
 from core.loss.non_saturating_gan_loss import NonSaturatingGANLoss
 from core.loss.perceptual_loss import PerceptualLoss
+from core.loss.path_length_regularization import PathLengthRegularization
 from pytorch_wavelets import DWTInverse, DWTForward
 
 
@@ -12,6 +13,7 @@ class DistillerLoss(nn.Module):
             discriminator_size,
             perceptual_size=256,
             input_shape=(4, 4),
+            path_length_regularization_decay=0.01,
             loss_weights={"l1": 1.0, "l2": 1.0, "loss_p": 1.0, "loss_g": 0.5}
     ):
         super().__init__()
@@ -24,6 +26,10 @@ class DistillerLoss(nn.Module):
         self.gan_loss = NonSaturatingGANLoss(
             image_size=int(discriminator_size),
             input_shape=input_shape
+        )
+        # path length regularization
+        self.path_length_regularization = PathLengthRegularization(
+            decay = path_length_regularization_decay
         )
         # loss weights
         self.loss_weights = loss_weights
@@ -65,6 +71,11 @@ class DistillerLoss(nn.Module):
     def reg_d(self, real):
         out = {}
         out["loss"] = out["d_reg"] = self.gan_loss.reg_d(real["img"])
+        return out
+
+    def reg_g(self, fake, latent):
+        out = self.path_length_regularization(fake, latent)
+        out["loss"] = out["path_loss"]
         return out
 
     def img_to_dwt(self, img):
