@@ -1,10 +1,8 @@
 {
     "logger": {
-        "type": "NeptuneLogger",
+        "type": "MLFlowLogger",
         "params": {
-            "offline_mode": true,
-            "project_name": "MobileStyleGAN",
-            "experiment_name": "baseline"
+            "experiment_name": "mobilestylegan_shhq_1024"
         }
     },
     "trainset": {
@@ -40,7 +38,7 @@
         "num_workers": 0,
         "lr_student": 5e-4,
         "lr_gan": 5e-4,
-        "batch_size": 2,
+        "batch_size": 4,
         "max_epochs": 100,
         "mode": "g,d",
         "reg_d_interval": 16,
