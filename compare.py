@@ -31,7 +31,7 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     # pipeline configure
     parser.add_argument("--cfg", type=str, default="configs/mobile_stylegan_ffhq.json", help="path to config file")
-    parser.add_argument("--ckpt", type=str, default="mobilestylegan_ffhq.ckpt", help="path to checkpoint")
+    parser.add_argument("--ckpt", type=str, default="", help="path to checkpoint")
     parser.add_argument("--truncated", action='store_true', help="use truncation mode")
     args = parser.parse_args()
     main(args)

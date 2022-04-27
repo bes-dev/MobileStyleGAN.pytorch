@@ -17,4 +17,4 @@ class NoiseManager:
         if size in self.noise_lut:
             return self.noise_lut[size]
         else:
-            return torch.randn(b, 1, size, size).to(self.device)
+            return torch.randn(b, 1, size[0], size[1]).to(self.device)

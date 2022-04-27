@@ -56,13 +56,15 @@ class MobileSynthesisNetwork(nn.Module):
         noise = NoiseManager(noise, self.device_info.device, self.trace_model)
 
         hidden = self.input(style)
-        out["noise"].append(noise(hidden.size(-1)))
+        size_h, size_w = hidden.size()[2:]
+        out["noise"].append(noise(size=(size_h, size_w)))
         hidden = self.conv1(hidden, style if style.ndim == 2 else style[:, 0, :], noise=out["noise"][-1])
         img = self.to_img1(hidden, style if style.ndim == 2 else style[:, 1, :])
         out["freq"].append(img)
 
         for i, m in enumerate(self.layers):
-            out["noise"].append(noise(2 ** (i + 3), 2))
+            size_h, size_w = size_h * 2, size_w * 2
+            out["noise"].append(noise(size=(size_h, size_w), b=2))
             _style = style if style.ndim == 2 else style[:, m.wsize()*i + 1: m.wsize()*i + m.wsize() + 1, :]
             hidden, freq = m(hidden, _style, noise=out["noise"][-1])
             out["freq"].append(freq)
