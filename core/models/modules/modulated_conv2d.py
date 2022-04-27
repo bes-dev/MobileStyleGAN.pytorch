@@ -24,7 +24,8 @@ class ModulatedConv2d(nn.Module):
         # create demodulation parameters
         self.demodulate = demodulate
         if self.demodulate:
-            self.register_buffer("style_inv", torch.randn(1, 1, channels_in, 1, 1))
+            # self.register_buffer("style_inv", torch.randn(1, 1, channels_in, 1, 1))
+            self.style_inv = nn.Parameter(torch.randn(1, 1, channels_in, 1, 1), requires_grad=True)
         # some service staff
         self.scale = 1.0 / math.sqrt(channels_in * kernel_size ** 2)
         self.padding = kernel_size // 2
