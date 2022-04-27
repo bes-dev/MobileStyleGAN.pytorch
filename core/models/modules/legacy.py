@@ -272,22 +272,20 @@ class ModulatedConv2d(nn.Module):
 class NoiseInjection(nn.Module):
     def __init__(self):
         super().__init__()
-
         self.weight = nn.Parameter(torch.zeros(1))
 
     def forward(self, image, noise=None):
         if noise is None:
             batch, _, height, width = image.shape
             noise = image.new_empty(batch, 1, height, width).normal_()
-
         return image + self.weight * noise
 
 
 class ConstantInput(nn.Module):
-    def __init__(self, channel, size=4):
+    def __init__(self, channel, size=(4, 4)):
         super().__init__()
 
-        self.input = nn.Parameter(torch.randn(1, channel, size, size))
+        self.input = nn.Parameter(torch.randn(1, channel, size[0], size[1]))
 
     def forward(self, input):
         batch = input.shape[0]

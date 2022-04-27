@@ -42,14 +42,16 @@ class SynthesisNetwork(nn.Module):
             self,
             size,
             style_dim,
+            input_shape=(4, 4),
             blur_kernel=[1, 3, 3, 1],
             channels = [512, 512, 512, 512, 512, 256, 128, 64, 32]
     ):
         super().__init__()
         self.size = size
         self.style_dim = style_dim
+        self.input_shape = input_shape
 
-        self.input = ConstantInput(channels[0])
+        self.input = ConstantInput(channels[0], size=input_shape)
         self.conv1 = StyledConv(
             channels[0], channels[0], 3, style_dim, blur_kernel=blur_kernel
         )
@@ -75,8 +77,9 @@ class SynthesisNetwork(nn.Module):
         out = {"noise": [], "rgb": [], "img": None}
 
         hidden = self.input(style)
+        size_h, size_w = hidden.size(-2), hidden.size(-1)
         if noise is None:
-            _noise = torch.randn(1, 1, hidden.size(-1), hidden.size(-1)).to(style.device)
+            _noise = torch.randn(1, 1, size_h, size_w).to(style.device)
         else:
             _noise = noise[0]
         out["noise"].append(_noise)
@@ -85,7 +88,10 @@ class SynthesisNetwork(nn.Module):
         out["rgb"].append(img)
 
         for i, m in enumerate(self.layers):
-            shape = [2, 1, 1, 2 ** (i + 3), 2 ** (i + 3)]
+            # shape = [2, 1, 1, 2 ** (i + 3), 2 ** (i + 3)]
+            size_h *= 2
+            size_w *= 2
+            shape = [2, 1, 1, size_h, size_w]
             if noise is None:
                 _noise = torch.randn(*shape).to(style.device)
             else:

@@ -11,6 +11,7 @@ class DistillerLoss(nn.Module):
             self,
             discriminator_size,
             perceptual_size=256,
+            input_shape=(4, 4),
             loss_weights={"l1": 1.0, "l2": 1.0, "loss_p": 1.0, "loss_g": 0.5}
     ):
         super().__init__()
@@ -20,7 +21,10 @@ class DistillerLoss(nn.Module):
         # perceptual_loss
         self.perceptual_loss = PerceptualLoss(perceptual_size)
         # gan loss
-        self.gan_loss = NonSaturatingGANLoss(image_size=int(discriminator_size))
+        self.gan_loss = NonSaturatingGANLoss(
+            image_size=int(discriminator_size),
+            input_shape=input_shape
+        )
         # loss weights
         self.loss_weights = loss_weights
         # utils
@@ -32,7 +36,8 @@ class DistillerLoss(nn.Module):
         loss = {"l1": 0, "l2": 0}
         for _pred in pred["freq"]:
             _pred_rgb = self.dwt_to_img(_pred)
-            _gt_rgb = F.interpolate(gt["img"], size=_pred_rgb.size(-1), mode='bilinear', align_corners=True)
+            _, _, h, w = _pred_rgb.size()
+            _gt_rgb = F.interpolate(gt["img"], size=(h, w), mode='bilinear', align_corners=True)
             _gt_freq = self.img_to_dwt(_gt_rgb)
             loss["l1"] += self.l1_loss(_pred_rgb, _gt_rgb)
             loss["l2"] += self.l2_loss(_pred_rgb, _gt_rgb)

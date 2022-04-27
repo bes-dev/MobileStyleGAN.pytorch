@@ -23,5 +23,15 @@
         "url": "https://drive.google.com/uc?id=11Kja0XGE8liLb6R5slNZjF3j3v_6xydt",
         "name": "mobilestylegan_ffhq.ckpt",
         "md5": "8de24b4d08049c32dbec8beca5ed2074"
+    },
+    "stylegan2_shhq_1024_synthesis_network.ckpt": {
+        "url": "https://drive.google.com/uc?id=16r_pVNCwQ3QgAvfYaf9Jy4onceS5_HUN",
+        "name": "stylegan2_shhq_1024_synthesis_network.ckpt",
+        "md5": "95ed7c6ef21fa4c9ebab7a0a617f40fe"
+    },
+    "stylegan2_shhq_1024_mapping_network.ckpt": {
+        "url": "https://drive.google.com/uc?id=1EuHz2G_cdoNuLMegsmle04jaZMyCIrzK",
+        "name": "stylegan2_shhq_1024_mapping_network.ckpt",
+        "md5": "be7f6f28c8c445db377c72f4cb80ee49"
     }
 }

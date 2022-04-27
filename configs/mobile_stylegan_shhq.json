@@ -1,0 +1,50 @@
+{
+    "logger": {
+        "type": "NeptuneLogger",
+        "params": {
+            "offline_mode": true,
+            "project_name": "MobileStyleGAN",
+            "experiment_name": "baseline"
+        }
+    },
+    "trainset": {
+        "emb_size": 512,
+        "n_batches": 10000
+    },
+    "valset": {
+        "emb_size": 512,
+        "n_batches": 200
+    },
+    "teacher": {
+        "mapping_network": {
+            "name": "stylegan2_shhq_1024_mapping_network.ckpt"
+        },
+        "synthesis_network": {
+            "name": "stylegan2_shhq_1024_synthesis_network.ckpt"
+        }
+    },
+    "distillation_loss": {
+        "perceptual_size": 256,
+        "loss_weights": {
+            "l1": 1.0,
+            "l2": 1.0,
+            "loss_p": 1.0,
+            "loss_g": 0.5
+        }
+    },
+    "trainer": {
+        "monitor": "kid_val",
+        "monitor_mode": "min",
+        "style_mean": 4096,
+        "style_mean_weight": 0.5,
+        "num_workers": 0,
+        "lr_student": 5e-4,
+        "lr_gan": 5e-4,
+        "batch_size": 2,
+        "max_epochs": 100,
+        "mode": "g,d",
+        "reg_d_interval": 16,
+        "truncated": false,
+        "stylemix_p": [0.0, 0.0]
+    }
+}

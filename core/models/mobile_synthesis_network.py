@@ -13,12 +13,13 @@ class MobileSynthesisNetwork(nn.Module):
     def __init__(
             self,
             style_dim,
-            channels = [512, 512, 512, 512, 512, 256, 128, 64]
+            channels = [512, 512, 512, 512, 512, 256, 128, 64],
+            input_shape = (4, 4)
     ):
         super().__init__()
         self.style_dim = style_dim
 
-        self.input = ConstantInput(channels[0])
+        self.input = ConstantInput(channels[0], input_shape)
         self.conv1 = StyledConv2d(
             channels[0],
             channels[0],

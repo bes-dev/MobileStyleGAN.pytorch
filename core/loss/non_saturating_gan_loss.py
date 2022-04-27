@@ -24,13 +24,15 @@ class NonSaturatingGANLoss(nn.Module):
             self,
             image_size,
             channels_in=3,
-            r1_gamma=10):
+            r1_gamma=10,
+            input_shape=(4, 4)):
         super().__init__()
         # discriminator
         self.m = Discriminator(
             size=image_size,
             channels_in=channels_in,
-            activate=False
+            activate=False,
+            input_shape=input_shape
         )
         # diffaugs
         self.transforms = get_default_transforms()

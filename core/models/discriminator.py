@@ -74,7 +74,7 @@ class ResBlock(nn.Module):
 
 
 class Discriminator(nn.Module):
-    def __init__(self, size, channels_in=3, channel_multiplier=2, blur_kernel=[1, 3, 3, 1], activate=True):
+    def __init__(self, size, channels_in=3, channel_multiplier=2, blur_kernel=[1, 3, 3, 1], input_shape=(4, 4), activate=True):
         super().__init__()
 
         channels = {
@@ -109,7 +109,8 @@ class Discriminator(nn.Module):
 
         self.final_conv = ConvLayer(in_channel + 1, channels[4], 3)
         self.final_linear = nn.Sequential(
-            EqualLinear(channels[4] * 4 * 4, channels[4], activation='fused_lrelu'),
+            # EqualLinear(channels[4] * 4 * 4, channels[4], activation='fused_lrelu'),
+            EqualLinear(channels[4] * input_shape[0] * input_shape[1], channels[4], activation='fused_lrelu'),
             EqualLinear(channels[4], 1),
         )
         self.activate = activate

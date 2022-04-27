@@ -40,6 +40,7 @@ class Distiller(pl.LightningModule):
         # student network
         self.student = MobileSynthesisNetwork(
             style_dim=self.mapping_net.style_dim,
+            input_shape=synthesis_net_ckpt["params"]["input_shape"],
             channels=synthesis_net_ckpt["params"]["channels"][:-1]
         )
 
@@ -57,6 +58,7 @@ class Distiller(pl.LightningModule):
         # loss
         self.loss = DistillerLoss(
             discriminator_size=self.synthesis_net.size,
+            input_shape=synthesis_net_ckpt["params"]["input_shape"],
             **cfg.distillation_loss
         )
 
